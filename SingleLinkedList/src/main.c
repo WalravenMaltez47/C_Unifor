@@ -1,50 +1,84 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// Estrutura Node
 typedef struct Node {
     int data;
     struct Node *next;
 } Node;
 
-Node *creatNode(int data) {
+// Estrutura LinkedList
+typedef struct LinkedList {
+    Node *head;
+    Node *tail;
+    int length;
+} LinkedList;
+
+Node *createNode(int data) {
     Node *node = (Node*)malloc(sizeof(Node));
-    node->data = data;
-    node->next = NULL;
+    if (node != NULL) {
+        node->data = data;
+        node->next = NULL;
+    }
     return node;
 }
 
-void addNode(Node **head, int data) {
-    Node *newNode = creatNode(data);
-
-    if(*head==NULL) {
-        *head = newNode;
+LinkedList *createLinkedList() {
+    LinkedList *list = (LinkedList*)malloc(sizeof(LinkedList));
+    if (list != NULL) {
+        list->head = NULL;
+        list->tail = NULL;
+        list->length = 0;
     }
-
-    else {
-        Node *current = *head;
-        while(current->next!=NULL) {
-            current = current->next;
-        }
-        current->next = newNode;        
-    }
+    return list;
 }
 
-void printList(Node *head) {
-    Node *current = head;
-    while(current!=NULL) {
+void addNode(LinkedList *list, int data) {
+    Node *newNode = createNode(data);
+    if (newNode == NULL) {
+        return;
+    }
+
+    if (list->head == NULL) {
+        list->head = newNode;
+        list->tail = newNode;
+    } else {
+        list->tail->next = newNode;
+        list->tail = newNode;
+    }
+    list->length++;
+}
+
+void printList(LinkedList *list) {
+    Node *current = list->head;
+    while (current != NULL) {
         printf("%d ", current->data);
         current = current->next;
     }
     printf("\n");
 }
 
+void freeList(LinkedList *list) {
+    Node *current = list->head;
+    Node *nextNode;
+    while (current != NULL) {
+        nextNode = current->next;
+        free(current);
+        current = nextNode;
+    }
+    free(list);
+}
+
 int main() {
-    Node *head = NULL;
-    addNode(&head, 1);
-    addNode(&head, 2);
-    addNode(&head, 3);
-    addNode(&head, 4);
-    addNode(&head, 5);
-    printList(head);
+    LinkedList *list = createLinkedList();
+
+    addNode(list, 1);
+    addNode(list, 2);
+    addNode(list, 3);
+
+    printList(list);
+
+    freeList(list); // Libera a memória alocada para a lista
+
     return 0;
 }
